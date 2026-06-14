@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saebaan — Digital Craftsmanship</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+  :root {
+    --bg: #0a0d2e;
+    --bg2: #161948;
+    --accent: #a64198;
+    --accent2: #d468bf;
+    --accent3: #7b2d6e;
+    --gold: #d4a574;
+    --white: #ffffff;
+    --dim: rgba(255,255,255,0.6);
+    --muted: rgba(255,255,255,0.3);
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    overflow-x: hidden;
+    line-height: 1.6;
+    cursor: none;
+  }
+
+  /* ── Custom Cursor ── */
+  .cursor { position: fixed; width: 20px; height: 20px; border: 2px solid var(--accent2); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, border-color 0.3s, background 0.3s; mix-blend-mode: difference; }
+  .cursor-dot { position: fixed; width: 4px; height: 4px; background: var(--white); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
+  .cursor.hover { width: 50px; height: 50px; background: rgba(214,104,191,0.15); border-color: var(--accent2); }
+  .cursor-trail { position: fixed; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9998; opacity: 0.4; }
+
+  /* ── Canvas Layers ── */
+  #bg-canvas, #blob-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  #bg-canvas { z-index: 0; }
+  #blob-canvas { z-index: 0; opacity: 0.5; }
+
+  /* ── Grain overlay ── */
+  .grain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); background-size: 200px; }
+
+  /* ── Navigation ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.8rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+  }
+  nav.scrolled {
+    background: rgba(10,13,46,0.8);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-bottom: 1px solid rgba(166,65,152,0.12);
+    padding: 1rem 4rem;
+  }
+  .nav-logo svg { height: 44px; width: auto; transition: transform 0.4s; }
+  .nav-logo:hover svg { transform: scale(1.05); }
+  .nav-links { display: flex; gap: 3rem; list-style: none; }
+  .nav-links a {
+    color: var(--dim); text-decoration: none; font-size: 0.82rem;
+    font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    transition: color 0.3s; position: relative; cursor: none;
+  }
+  .nav-links a::before { content: ''; position: absolute; bottom: -6px; left: 0; width: 0; height: 1px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::before { width: 100%; }
+  .nav-cta {
+    background: transparent; color: var(--white); border: 1px solid rgba(166,65,152,0.5);
+    padding: 0.65rem 1.6rem; border-radius: 6px; font-size: 0.82rem;
+    font-weight: 600; cursor: none; letter-spacing: 0.04em; text-transform: uppercase;
+    transition: all 0.4s; text-decoration: none;
+  }
+  .nav-cta:hover {
+    background: var(--accent); border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(166,65,152,0.4), inset 0 0 30px rgba(166,65,152,0.1);
+  }
+
+  /* ── Sections ── */
+  section { position: relative; z-index: 1; padding: 8rem 4rem; }
+
+  .section-tag {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em;
+    color: var(--accent2); margin-bottom: 1.5rem; font-weight: 600;
+    position: relative; padding-left: 2.5rem;
+  }
+  .section-tag::before { content: ''; position: absolute; left: 0; top: 50%; width: 1.8rem; height: 1px; background: var(--accent2); }
+
+  /* ── Hero ── */
+  #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 6rem; }
+  .hero-inner { max-width: 1300px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 6rem; align-items: center; }
+  .hero-text { position: relative; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    border: 1px solid rgba(166,65,152,0.3); padding: 0.4rem 1.2rem;
+    border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--accent2); margin-bottom: 2.5rem;
+    backdrop-filter: blur(10px);
+  }
+  .hero-eyebrow .pulse { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: pulse 2s infinite; }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.2rem, 6.5vw, 6rem);
+    font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 1.8rem;
+  }
+  h1 .hl { background: linear-gradient(135deg, var(--accent2), var(--accent), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  h1 .hl2 { color: var(--gold); font-style: italic; }
+  .hero-desc {
+    font-size: 1.15rem; color: var(--dim); max-width: 460px; line-height: 1.8;
+    margin-bottom: 2.8rem; font-weight: 400;
+  }
+  .hero-btns { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 0.95rem 2.2rem; border-radius: 6px; font-size: 0.9rem;
+    font-weight: 600; text-decoration: none; letter-spacing: 0.02em;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2); cursor: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    color: var(--white); border: none;
+    box-shadow: 0 4px 25px rgba(166,65,152,0.35);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 40px rgba(166,65,152,0.5);
+    transform: translateY(-3px);
+  }
+  .btn-ghost {
+    background: transparent; color: var(--white);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent2); }
+  .btn-arrow { display: inline-block; transition: transform 0.3s; }
+  .btn:hover .btn-arrow { transform: translateX(4px); }
+
+  .hero-visual { position: relative; display: flex; align-items: center; justify-content: center; }
+  .hero-logo-container { position: relative; z-index: 2; }
+  .hero-logo-container svg { width: 300px; height: auto; filter: drop-shadow(0 0 80px rgba(166,65,152,0.45)) drop-shadow(0 0 20px rgba(214,104,191,0.3)); animation: heroFloat 7s ease-in-out infinite; }
+  .hero-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(166,65,152,0.15); animation: ringSpin 20s linear infinite; pointer-events: none; }
+  .hero-ring:nth-child(2) { width: 450px; height: 450px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .hero-ring:nth-child(3) { width: 380px; height: 380px; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-direction: reverse; animation-duration: 15s; border-color: rgba(214,104,191,0.1); }
+  .hero-ring:nth-child(4) { width: 310px; height: 310px; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-duration: 25s; border-style: dashed; }
+
+  /* ── Scroll indicator ── */
+  .scroll-indicator { position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .scroll-mouse { width: 26px; height: 40px; border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; position: relative; }
+  .scroll-mouse::after { content: ''; width: 4px; height: 8px; background: var(--accent2); border-radius: 2px; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); animation: scrollWheel 1.8s ease-in-out infinite; }
+  .scroll-text { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+
+  /* ── Stats Bar ── */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 5rem;
+    padding: 4rem 2rem; border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative; z-index: 1;
+    background: rgba(10,13,46,0.5); backdrop-filter: blur(10px);
+  }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: var(--accent2); line-height: 1; }
+  .stat-label { font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.5rem; }
+
+  /* ── Services ── */
+  #services { padding: 10rem 4rem; }
+  .services-head { text-align: center; margin-bottom: 6rem; }
+  .services-head h2 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .services-head p { color: var(--dim); font-size: 1.1rem; max-width: 500px; margin: 0 auto; }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+  .service-card {
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: 16px; padding: 3rem 2.5rem;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative; overflow: hidden; cursor: none;
+  }
+  .service-card::after {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(166,65,152,0.08), transparent 60%);
+    opacity: 0; transition: opacity 0.5s;
+  }
+  .service-card:hover { border-color: rgba(166,65,152,0.3); transform: translateY(-10px); box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(166,65,152,0.2) inset; }
+  .service-card:hover::after { opacity: 1; }
+  .service-card .s-icon { width: 60px; height: 60px; background: rgba(166,65,152,0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; transition: transform 0.4s; }
+  .service-card:hover .s-icon { transform: scale(1.1) rotate(-5deg); }
+  .service-card h3 { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.8rem; letter-spacing: -0.01em; }
+  .service-card p { color: var(--dim); font-size: 0.92rem; line-height: 1.75; }
+  .service-card .s-num { position: absolute; top: 1.5rem; right: 2rem; font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: rgba(166,65,152,0.08); line-height: 1; }
+
+  /* ── Portfolio ── */
+  #portfolio { padding: 10rem 4rem; position: relative; }
+  .portfolio-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .portfolio-text h2 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 1.5rem; }
+  .portfolio-text p { color: var(--dim); font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem; }
+  .portfolio-card {
+    background: linear-gradient(145deg, rgba(22,25,72,0.8), rgba(10,13,46,0.6));
+    border: 1px solid rgba(166,65,152,0.2); border-radius: 20px;
+    padding: 3.5rem 3rem; position: relative; overflow: hidden;
+    backdrop-filter: blur(20px); cursor: none;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .portfolio-card:hover { border-color: rgba(166,65,152,0.5); box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(166,65,152,0.1); transform: translateY(-6px); }
+  .portfolio-card .pc-glow { position: absolute; top: -100px; right: -100px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(166,65,152,0.15), transparent 70%); pointer-events: none; }
+  .portfolio-card .pc-url { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--accent2); margin-bottom: 1.2rem; letter-spacing: -0.01em; }
+  .portfolio-card .pc-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.8rem; }
+  .portfolio-card .pc-tag { background: rgba(166,65,152,0.12); color: var(--accent2); padding: 0.3rem 0.9rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.03em; border: 1px solid rgba(166,65,152,0.15); }
+  .portfolio-card .pc-desc { color: var(--dim); font-size: 0.95rem; line-height: 1.8; margin-bottom: 2rem; }
+  .portfolio-card .pc-link { color: var(--accent2); text-decoration: none; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.5rem; transition: gap 0.3s; cursor: none; }
+  .portfolio-card .pc-link:hover { gap: 0.9rem; }
+  .pc-decor { position: absolute; width: 120px; height: 120px; border: 1px solid rgba(166,65,152,0.1); border-radius: 12px; transform: rotate(25deg); }
+  .pc-decor:nth-child(1) { top: -40px; right: -40px; }
+  .pc-decor:nth-child(2) { bottom: -30px; left: -30px; width: 80px; height: 80px; transform: rotate(-15deg); }
+
+  /* ── Process Marquee ── */
+  .process-strip {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    overflow: hidden; position: relative; z-index: 1;
+    background: rgba(10,13,46,0.4);
+  }
+  .process-marquee { display: flex; animation: marquee 35s linear infinite; padding: 2.2rem 0; }
+  .process-marquee span { flex-shrink: 0; padding: 0 2rem; font-size: 0.9rem; font-weight: 500; color: var(--dim); text-transform: uppercase; letter-spacing: 0.15em; white-space: nowrap; }
+  .process-marquee .sep { color: var(--accent2); font-weight: 700; }
+
+  /* ── Contact ── */
+  #contact { padding: 10rem 4rem; text-align: center; }
+  .contact-inner { max-width: 700px; margin: 0 auto; }
+  #contact h2 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+  #contact > .contact-inner > p { color: var(--dim); font-size: 1.15rem; line-height: 1.8; margin-bottom: 3rem; }
+  .contact-btn {
+    display: inline-block; background: linear-gradient(135deg, var(--accent), var(--accent3));
+    color: var(--white); padding: 1.2rem 3.5rem; border-radius: 6px;
+    font-size: 1.05rem; font-weight: 600; text-decoration: none;
+    letter-spacing: 0.02em; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+    box-shadow: 0 4px 30px rgba(166,65,152,0.3); cursor: none;
+  }
+  .contact-btn:hover {
+    box-shadow: 0 8px 50px rgba(166,65,152,0.5);
+    transform: translateY(-3px);
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.05); padding: 2.5rem 4rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.82rem; color: var(--muted); position: relative; z-index: 1;
+  }
+  footer .footer-logo svg { height: 30px; width: auto; opacity: 0.6; }
+
+  /* ── Animations ── */
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+  @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+  @keyframes ringSpin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes scrollWheel { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 100% { opacity: 0; transform: translateX(-50%) translateY(12px); } }
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+  .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.9s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    body { cursor: auto; }
+    .cursor, .cursor-dot, .cursor-trail { display: none; }
+    nav { padding: 1.2rem 1.5rem; }
+    nav.scrolled { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero-inner { grid-template-columns: 1fr; gap: 4rem; text-align: center; }
+    .hero-desc { margin: 0 auto 2rem auto; }
+    .hero-btns { justify-content: center; }
+    .hero-visual { order: -1; }
+    .hero-logo-container svg { width: 200px; }
+    .hero-ring { display: none; }
+    section { padding: 5rem 1.5rem; }
+    .stats-bar { flex-wrap: wrap; gap: 2.5rem; }
+    .stat-num { font-size: 2.2rem; }
+    .services-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .portfolio-inner { grid-template-columns: 1fr; gap: 3rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .process-marquee span { font-size: 0.7rem; padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor"></div>
+<div class="cursor-dot"></div>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="blob-canvas"></canvas>
+<div class="grain"></div>
+
+<nav id="navbar">
+  <div class="nav-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.28 463">
+      <defs><style>.c1{fill:#0a0d2e}.c2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:10px}.c3{fill:#a64198}</style></defs>
+      <rect class="c1" x="-77.54" y="-11.22" width="747.27" height="485.43"/>
+      <g><path class="c3" d="M177.33 177.88c-.11-3.65-2.74-4.8-5.82-4.8s-5.48 1.83-5.48 4.22c0 3.43 3.08 5.14 11.88 7.42 15.07 4 19.98 10.05 19.98 19.3 0 13.25-11.42 21.58-25.81 21.58s-24.44-8.11-25.81-21.01h18.84c.57 4 3.43 5.82 7.19 5.82 3.31 0 6.62-1.94 6.62-4.91 0-3.54-2.17-5.37-11.65-8.34-15.99-4.91-20.21-11.19-20.21-18.61 0-12.56 11.76-20.67 24.55-20.67 13.7 0 23.41 7.54 24.32 19.98h-18.61Z"/><path class="c3" d="M254.99 223.44v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.77 0 14.96 3.08 18.61 8.91h.23v-6.74h18.96v63.37h-18.96Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.97 15.99 15.76 15.99 15.87-7.08 15.87-16.21Zm48.07 5.83c1.03 7.19 7.08 11.99 14.84 11.99 5.14 0 8.45-1.94 11.53-5.94h19.41c-6.05 13.82-17.59 21.92-30.94 21.92-18.27 0-33.57-14.73-33.57-33.57s14.62-34.03 33.23-34.03 33.46 14.96 33.46 34.6c0 1.83-.11 3.31-.46 5.02h-47.5Zm29.01-12.79c-1.48-6.51-7.19-10.85-14.5-10.85-6.85 0-12.79 4.11-14.27 10.85h28.78Z"/><path class="c3" d="M150.39 316.06v-84.5h18.95v26.15c5.02-5.37 11.42-7.19 18.04-7.19 16.44 0 31.52 12.33 31.52 33.46 0 19.53-12.45 34.26-31.97 34.26-7.65 0-15.3-3.54-18.16-8.91h-.23v6.74h-18.16Zm49.55-31.75c0-8.45-6.51-16.1-15.64-16.1s-15.64 7.19-15.64 15.99c0 9.36 6.62 16.33 15.42 16.33s15.87-7.08 15.87-16.21Zm77.2 31.75v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.77 0 14.96 3.08 18.61 8.91h.23v-6.74h18.95v63.37h-18.95Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.97 15.99 15.76 15.99 15.87-7.08 15.87-16.21Zm80.39 31.75v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.76 0 14.96 3.08 18.61 8.91h.23v-6.74h18.95v63.37h-18.95Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.96 15.99 15.76 15.99 15.87-7.08 15.87-16.21Zm72.52 31.75v-35.17c0-8.56-2.97-12.56-9.93-12.56-7.65 0-10.85 4.22-10.85 12.79v34.94h-18.95v-63.37h17.7v6.74h.23c4-6.51 9.59-8.91 17.24-8.91 11.42 0 23.52 6.39 23.52 25.12v40.42h-18.95Z"/><path class="c2" d="M410.28 144.77c-17.77 0-32.72 12.42-37.05 29.26-.82 3.21-1.26 6.57-1.26 10.03 0 2.66.26 5.24.77 7.74h37.54"/><line class="c2" x1="405.82" y1="218.91" x2="405.82" y2="181.18"/><path class="c3" d="M364.65 181.18v18.61h82.33v-18.61h-82.33Z"/><path class="c2" d="M386.08 218.65c.33 5.28 4.62 9.45 9.86 9.45s9.51-4.17 9.84-9.45"/></g>
+    </svg>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#services" data-cursor="hover">Services</a></li>
+    <li><a href="#portfolio" data-cursor="hover">Work</a></li>
+    <li><a href="#contact" data-cursor="hover">Contact</a></li>
+  </ul>
+  <a href="mailto:hello@saebaan.com" class="nav-cta" data-cursor="hover">Get in Touch</a>
+</nav>
+
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow"><span class="pulse"></span>Digital Studio — Est. 2024</div>
+      <h1>We design &amp; build <span class="hl">digital products</span> with <span class="hl2">soul</span>.</h1>
+      <p class="hero-desc">Web applications, brand identities, and growth marketing for ambitious companies — crafted with obsessive attention to every detail.</p>
+      <div class="hero-btns">
+        <a href="#services" class="btn btn-primary" data-cursor="hover">Explore Services <span class="btn-arrow">→</span></a>
+        <a href="#portfolio" class="btn btn-ghost" data-cursor="hover">View Our Work</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-ring" style="width:450px;height:450px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+      <div class="hero-ring" style="width:380px;height:380px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+      <div class="hero-ring" style="width:310px;height:310px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+      <div class="hero-logo-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.28 463">
+          <defs><style>.c1{fill:#0a0d2e}.c2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:10px}.c3{fill:#a64198}</style></defs>
+          <rect class="c1" x="-77.54" y="-11.22" width="747.27" height="485.43"/>
+          <g><path class="c3" d="M177.33 177.88c-.11-3.65-2.74-4.8-5.82-4.8s-5.48 1.83-5.48 4.22c0 3.43 3.08 5.14 11.88 7.42 15.07 4 19.98 10.05 19.98 19.3 0 13.25-11.42 21.58-25.81 21.58s-24.44-8.11-25.81-21.01h18.84c.57 4 3.43 5.82 7.19 5.82 3.31 0 6.62-1.94 6.62-4.91 0-3.54-2.17-5.37-11.65-8.34-15.99-4.91-20.21-11.19-20.21-18.61 0-12.56 11.76-20.67 24.55-20.67 13.7 0 23.41 7.54 24.32 19.98h-18.61Z"/><path class="c3" d="M254.99 223.44v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.77 0 14.96 3.08 18.61 8.91h.23v-6.74h18.96v63.37h-18.96Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.97 15.99 15.76 15.99 15.87-7.08 15.87-16.21Zm48.07 5.83c1.03 7.19 7.08 11.99 14.84 11.99 5.14 0 8.45-1.94 11.53-5.94h19.41c-6.05 13.82-17.59 21.92-30.94 21.92-18.27 0-33.57-14.73-33.57-33.57s14.62-34.03 33.23-34.03 33.46 14.96 33.46 34.6c0 1.83-.11 3.31-.46 5.02h-47.5Zm29.01-12.79c-1.48-6.51-7.19-10.85-14.5-10.85-6.85 0-12.79 4.11-14.27 10.85h28.78Z"/><path class="c3" d="M150.39 316.06v-84.5h18.95v26.15c5.02-5.37 11.42-7.19 18.04-7.19 16.44 0 31.52 12.33 31.52 33.46 0 19.53-12.45 34.26-31.97 34.26-7.65 0-15.3-3.54-18.16-8.91h-.23v6.74h-18.16Zm49.55-31.75c0-8.45-6.51-16.1-15.64-16.1s-15.64 7.19-15.64 15.99c0 9.36 6.62 16.33 15.42 16.33s15.87-7.08 15.87-16.21Zm77.2 31.75v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.77 0 14.96 3.08 18.61 8.91h.23v-6.74h18.95v63.37h-18.95Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.97 15.99 15.76 15.99 15.87-7.08 15.87-16.21Zm80.39 31.75v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.76 0 14.96 3.08 18.61 8.91h.23v-6.74h18.95v63.37h-18.95Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.96 15.99 15.76 15.99 15.87-7.08 15.87-16.21Zm72.52 31.75v-35.17c0-8.56-2.97-12.56-9.93-12.56-7.65 0-10.85 4.22-10.85 12.79v34.94h-18.95v-63.37h17.7v6.74h.23c4-6.51 9.59-8.91 17.24-8.91 11.42 0 23.52 6.39 23.52 25.12v40.42h-18.95Z"/><path class="c2" d="M410.28 144.77c-17.77 0-32.72 12.42-37.05 29.26-.82 3.21-1.26 6.57-1.26 10.03 0 2.66.26 5.24.77 7.74h37.54"/><line class="c2" x1="405.82" y1="218.91" x2="405.82" y2="181.18"/><path class="c3" d="M364.65 181.18v18.61h82.33v-18.61h-82.33Z"/><path class="c2" d="M386.08 218.65c.33 5.28 4.62 9.45 9.86 9.45s9.51-4.17 9.84-9.45"/></g>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-mouse"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" data-count="24">0</div><div class="stat-label">Projects Delivered</div></div>
+  <div class="stat"><div class="stat-num" data-count="12">0</div><div class="stat-label">Happy Clients</div></div>
+  <div class="stat"><div class="stat-num" data-count="3">0</div><div class="stat-label">Awards Won</div></div>
+  <div class="stat"><div class="stat-num" data-count="100">0</div><div class="stat-label">Sprint Velocity</div></div>
+</div>
+
+<section id="services">
+  <div class="services-head reveal">
+    <div class="section-tag">What We Do</div>
+    <h2>End-to-end digital craftsmanship</h2>
+    <p>We handle everything from concept to launch — and beyond.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal"><span class="s-num">01</span>
+      <div class="s-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a64198" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+      <h3>Web Applications</h3>
+      <p>Full-stack platforms built with modern frameworks. SaaS, customer portals, and internal tools — engineered for performance, designed for humans.</p>
+    </div>
+    <div class="service-card reveal"><span class="s-num">02</span>
+      <div class="s-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a64198" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <h3>Digital Marketing</h3>
+      <p>Data-driven growth strategies. SEO, paid media, content marketing, and CRO — campaigns that deliver measurable, compounding returns.</p>
+    </div>
+    <div class="service-card reveal"><span class="s-num">03</span>
+      <div class="s-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a64198" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+      <h3>Brand Identity</h3>
+      <p>Cohesive visual systems that command attention. Logos, typography, color, motion, and guidelines — brands that resonate and endure.</p>
+    </div>
+  </div>
+</section>
+
+<div class="process-strip">
+  <div class="process-marquee">
+    <span>Discovery</span><span class="sep">✦</span>
+    <span>Strategy</span><span class="sep">✦</span>
+    <span>Design</span><span class="sep">✦</span>
+    <span>Development</span><span class="sep">✦</span>
+    <span>Launch</span><span class="sep">✦</span>
+    <span>Scale</span><span class="sep">✦</span>
+    <span>Discovery</span><span class="sep">✦</span>
+    <span>Strategy</span><span class="sep">✦</span>
+    <span>Design</span><span class="sep">✦</span>
+    <span>Development</span><span class="sep">✦</span>
+    <span>Launch</span><span class="sep">✦</span>
+    <span>Scale</span><span class="sep">✦</span>
+    <span>Discovery</span><span class="sep">✦</span>
+    <span>Strategy</span><span class="sep">✦</span>
+    <span>Design</span><span class="sep">✦</span>
+    <span>Development</span><span class="sep">✦</span>
+    <span>Launch</span><span class="sep">✦</span>
+    <span>Scale</span>
+  </div>
+</div>
+
+<section id="portfolio">
+  <div class="portfolio-inner">
+    <div class="portfolio-text reveal">
+      <div class="section-tag">Featured Work</div>
+      <h2>Projects we're proud to put our name on.</h2>
+      <p>We partner with ambitious companies to design and build digital products that drive real business outcomes — not just look good in a portfolio.</p>
+      <a href="https://prescribeandco.com" target="_blank" rel="noopener" class="btn btn-ghost" data-cursor="hover">Visit Site <span class="btn-arrow">→</span></a>
+    </div>
+    <div class="portfolio-card reveal" data-cursor="hover">
+      <div class="pc-decor"></div><div class="pc-decor"></div>
+      <div class="pc-glow"></div>
+      <div class="pc-url">prescribeandco.com</div>
+      <div class="pc-tags"><span class="pc-tag">Web App</span><span class="pc-tag">Healthcare</span><span class="pc-tag">Branding</span><span class="pc-tag">Telehealth</span></div>
+      <p class="pc-desc">A modern telehealth platform connecting patients with licensed medical professionals. Full brand identity, UX design, and full-stack development — delivered end-to-end.</p>
+      <a href="https://prescribeandco.com" target="_blank" rel="noopener" class="pc-link" data-cursor="hover">View Case Study →</a>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-inner reveal">
+    <div class="section-tag" style="display:inline-block;margin-bottom:2rem;">Let's Talk</div>
+    <h2>Ready to build something extraordinary?</h2>
+    <p>Whether you need a complete web platform, a brand that turns heads, or a marketing engine that drives growth — we're ready when you are.</p>
+    <a href="mailto:hello@saebaan.com" class="contact-btn" data-cursor="hover">hello@saebaan.com</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595.28 463">
+      <defs><style>.c1{fill:transparent}.c2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:10px}.c3{fill:#a64198}</style></defs>
+      <g><path class="c3" d="M177.33 177.88c-.11-3.65-2.74-4.8-5.82-4.8s-5.48 1.83-5.48 4.22c0 3.43 3.08 5.14 11.88 7.42 15.07 4 19.98 10.05 19.98 19.3 0 13.25-11.42 21.58-25.81 21.58s-24.44-8.11-25.81-21.01h18.84c.57 4 3.43 5.82 7.19 5.82 3.31 0 6.62-1.94 6.62-4.91 0-3.54-2.17-5.37-11.65-8.34-15.99-4.91-20.21-11.19-20.21-18.61 0-12.56 11.76-20.67 24.55-20.67 13.7 0 23.41 7.54 24.32 19.98h-18.61Z"/><path class="c3" d="M254.99 223.44v-6.85h-.23c-2.74 5.6-10.28 9.02-18.61 9.02-18.73 0-31.74-14.73-31.74-33.91s13.59-33.8 31.74-33.8c7.77 0 14.96 3.08 18.61 8.91h.23v-6.74h18.96v63.37h-18.96Zm0-31.75c0-8.91-7.19-16.1-16.1-16.1s-15.53 7.19-15.53 16.33 6.97 15.99 15.76 15.99 15.87-7.08 15.87-16.21Z"/><path class="c2" d="M410.28 144.77a37.3 37.3 0 0 0-37.05 29.26c-.82 3.21-1.26 6.57-1.26 10.03 0 2.66.26 5.24.77 7.74h37.54"/><line class="c2" x1="405.82" y1="218.91" x2="405.82" y2="181.18"/><path class="c3" d="M364.65 181.18v18.61h82.33v-18.61h-82.33Z"/><path class="c2" d="M386.08 218.65c.33 5.28 4.62 9.45 9.86 9.45s9.51-4.17 9.84-9.45"/></g>
+    </svg>
+  </div>
+  <span>&copy; 2026 Saebaan. All rights reserved.</span>
+</footer>
+
+<script>
+  // ── Custom cursor ──
+  const cursor = document.querySelector('.cursor');
+  const cursorDot = document.querySelector('.cursor-dot');
+  let mouseX = -100, mouseY = -100;
+  let cursorX = -100, cursorY = -100;
+  let dotX = -100, dotY = -100;
+  const trails = [];
+  const MAX_TRAILS = 12;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  const hoverTargets = document.querySelectorAll('[data-cursor="hover"], a, button, .btn, .service-card, .portfolio-card, .contact-btn, .nav-cta');
+  hoverTargets.forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  function updateCursor() {
+    cursorX += (mouseX - cursorX) * 0.12;
+    cursorY += (mouseY - cursorY) * 0.12;
+    dotX += (mouseX - dotX) * 0.3;
+    dotY += (mouseY - dotY) * 0.3;
+
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
+    cursorDot.style.left = dotX + 'px';
+    cursorDot.style.top = dotY + 'px';
+
+    if (Math.abs(mouseX - cursorX) > 2) {
+      const trail = document.createElement('div');
+      trail.className = 'cursor-trail';
+      trail.style.left = cursorX + 'px';
+      trail.style.top = cursorY + 'px';
+      document.body.appendChild(trail);
+      trails.push(trail);
+      if (trails.length > MAX_TRAILS) {
+        const old = trails.shift();
+        old.remove();
+      }
+      setTimeout(() => { trail.style.opacity = '0'; trail.style.transition = 'opacity 0.8s'; }, 100);
+      setTimeout(() => trail.remove(), 900);
+    }
+
+    requestAnimationFrame(updateCursor);
+  }
+  updateCursor();
+
+  // ── Background canvas: geometric particles ──
+  const bgCanvas = document.getElementById('bg-canvas');
+  const bgCtx = bgCanvas.getContext('2d');
+  let bgParticles = [];
+
+  function resizeBg() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeBg);
+  resizeBg();
+
+  class BgParticle {
+    constructor() { this.reset(); this.y = Math.random() * bgCanvas.height; }
+    reset() {
+      this.x = Math.random() * bgCanvas.width;
+      this.y = -10;
+      this.size = Math.random() * 2 + 0.5;
+      this.speedY = Math.random() * 0.5 + 0.2;
+      this.speedX = (Math.random() - 0.5) * 0.3;
+      this.opacity = Math.random() * 0.4 + 0.08;
+      this.angle = Math.random() * Math.PI * 2;
+      this.rotSpeed = (Math.random() - 0.5) * 0.01;
+    }
+    update() {
+      this.y += this.speedY;
+      this.x += this.speedX;
+      this.angle += this.rotSpeed;
+      if (this.y > bgCanvas.height + 20) { this.reset(); this.y = -10; }
+      if (this.x < -20) this.x = bgCanvas.width + 20;
+      if (this.x > bgCanvas.width + 20) this.x = -20;
+    }
+    draw() {
+      bgCtx.save();
+      bgCtx.translate(this.x, this.y);
+      bgCtx.rotate(this.angle);
+      bgCtx.fillStyle = `rgba(166,65,152,${this.opacity})`;
+      bgCtx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+      bgCtx.restore();
+    }
+  }
+
+  for (let i = 0; i < 80; i++) bgParticles.push(new BgParticle());
+
+  function connectBg() {
+    for (let i = 0; i < bgParticles.length; i++) {
+      for (let j = i + 1; j < bgParticles.length; j++) {
+        const dx = bgParticles[i].x - bgParticles[j].x;
+        const dy = bgParticles[i].y - bgParticles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 110) {
+          bgCtx.beginPath();
+          bgCtx.moveTo(bgParticles[i].x, bgParticles[i].y);
+          bgCtx.lineTo(bgParticles[j].x, bgParticles[j].y);
+          bgCtx.strokeStyle = `rgba(166,65,152,${0.06 * (1 - dist / 110)})`;
+          bgCtx.lineWidth = 0.5;
+          bgCtx.stroke();
+        }
+      }
+    }
+  }
+
+  // ── Blob canvas: animated gradient orbs ──
+  const blobCanvas = document.getElementById('blob-canvas');
+  const blobCtx = blobCanvas.getContext('2d');
+  function resizeBlob() {
+    blobCanvas.width = window.innerWidth;
+    blobCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeBlob);
+  resizeBlob();
+
+  const blobs = [
+    { x: 0.2, y: 0.15, r: 250, vx: 0.0002, vy: 0.00015, color: '166,65,152', opacity: 0.15 },
+    { x: 0.75, y: 0.7, r: 300, vx: -0.00018, vy: 0.00022, color: '214,104,191', opacity: 0.1 },
+    { x: 0.5, y: 0.4, r: 200, vx: 0.00025, vy: -0.00012, color: '123,45,110', opacity: 0.12 },
+  ];
+
+  function drawBlobs(time) {
+    blobCtx.clearRect(0, 0, blobCanvas.width, blobCanvas.height);
+    for (const b of blobs) {
+      b.x += b.vx;
+      b.y += b.vy;
+      if (b.x > 1.1 || b.x < -0.1) b.vx *= -1;
+      if (b.y > 1.1 || b.y < -0.1) b.vy *= -1;
+      const sx = b.x * blobCanvas.width;
+      const sy = b.y * blobCanvas.height;
+      const grd = blobCtx.createRadialGradient(sx, sy, 0, sx, sy, b.r);
+      grd.addColorStop(0, `rgba(${b.color},${b.opacity})`);
+      grd.addColorStop(1, 'rgba(0,0,0,0)');
+      blobCtx.fillStyle = grd;
+      blobCtx.beginPath();
+      blobCtx.arc(sx, sy, b.r, 0, Math.PI * 2);
+      blobCtx.fill();
+    }
+  }
+
+  function animateAll(time) {
+    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    for (const p of bgParticles) { p.update(); p.draw(); }
+    connectBg();
+    drawBlobs(time);
+    requestAnimationFrame(animateAll);
+  }
+  requestAnimationFrame(animateAll);
+
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── Nav scroll ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Counter animation ──
+  const statNums = document.querySelectorAll('.stat-num');
+  const countObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-count'));
+        const duration = 2000;
+        const start = performance.now();
+        function tick(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.floor(eased * target) + (target >= 100 ? '%' : '');
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        countObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  statNums.forEach(el => countObserver.observe(el));
+</script>
+
+</body>
+</html>
