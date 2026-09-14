@@ -163,10 +163,13 @@
   .disc-main h3 { font-size: clamp(21px, 2.3vw, 28px); letter-spacing: -.02em; margin: 0 0 6px; }
   .disc-main p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
   /* capabilities band */
-  .cap { margin-top: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--bg-soft); padding: 22px 28px; display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
-  .cap-label { font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); flex: none; }
-  .cap-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-  .cap-tags span { font-size: 13px; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 30px; padding: 7px 14px; }
+  .cap { margin-top: 20px; border: 1px solid var(--line); border-radius: 20px; background: var(--bg-soft); padding: 34px; display: grid; grid-template-columns: 0.7fr 1.55fr; gap: 44px; align-items: start; }
+  .cap-head .label { display: block; margin-bottom: 12px; }
+  .cap-head p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; max-width: 26ch; }
+  .cap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 32px; }
+  .cap-item { display: flex; align-items: center; gap: 13px; padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; color: var(--ink); }
+  .cap-item .ci { width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); display: grid; place-items: center; flex: none; }
+  .cap-item .ci svg { width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
   /* work */
   .work { display: grid; gap: 20px; }
@@ -287,7 +290,8 @@
     .surface-shell { padding: 0 20px; }
     .app { grid-template-columns: 1fr; } .app-side { display: none; }
     .svc2 { grid-template-columns: 1fr; gap: 24px; }
-    .cap { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .cap { grid-template-columns: 1fr; gap: 24px; padding: 26px; }
+    .cap-grid { grid-template-columns: 1fr; }
     .founders { grid-template-columns: 1fr; }
     .proj, .proj.flip .proj-media { grid-template-columns: 1fr; order: 0; }
     .proj-media { min-height: 280px; }
