@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saebaan — Homepage demos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050509; --line:rgba(255,255,255,.12); --text:#f5f5f7; --muted:rgba(245,245,247,.56); --accent:#d468bf; --grad:linear-gradient(100deg,#a64198,#d468bf 55%,#ffb27a); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:'Archivo',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px); background-size:56px 56px; min-height:100vh; }
+  .mono { font-family:'JetBrains Mono',monospace; }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 28px; }
+  header { padding:80px 0 40px; text-align:center; }
+  .eyebrow { font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); }
+  h1 { font-size:clamp(34px,6vw,64px); font-weight:800; letter-spacing:-.03em; margin:16px 0 14px; }
+  h1 .g { background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  header p { color:var(--muted); max-width:60ch; margin:0 auto; font-size:16px; line-height:1.6; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; padding:24px 0 40px; }
+  .lead { padding:24px 0 40px; }
+  .lead a.card { display:grid; grid-template-columns:1.1fr 1fr; }
+  .lead .thumb { height:auto; min-height:260px; border-bottom:0; border-right:1px solid var(--line); }
+  .rec { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#08110a; background:#7fe0a8; padding:4px 10px; margin-bottom:14px; }
+  .t4 { background:#fbfafc; background-image:radial-gradient(circle at 75% 15%,rgba(207,79,187,.35),transparent 55%); }
+  .t4 b { color:#17131d; }
+  @media (max-width:820px){ .lead a.card{ grid-template-columns:1fr; } .lead .thumb{ border-right:0; border-bottom:1px solid var(--line); } }
+  .card { border:1px solid var(--line); background:#0b0c12; text-decoration:none; color:inherit; display:flex; flex-direction:column; transition:transform .2s, border-color .2s; overflow:hidden; }
+  .card:hover { transform:translateY(-6px); border-color:var(--accent); }
+  .thumb { height:180px; position:relative; overflow:hidden; border-bottom:1px solid var(--line); }
+  .t1 { background:#04040a; background-image:radial-gradient(#c247a6 2px,transparent 2px); background-size:14px 14px; }
+  .t1::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,#04040a); }
+  .t2 { background:radial-gradient(circle at 30% 20%,rgba(166,65,152,.7),transparent 55%),radial-gradient(circle at 80% 80%,rgba(255,191,135,.4),transparent 55%),#08060d; }
+  .t3 { background:#0a0710; background-image:linear-gradient(rgba(214,104,191,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(214,104,191,.16) 1px,transparent 1px); background-size:22px 22px; }
+  .thumb b { position:absolute; left:20px; bottom:16px; z-index:1; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#fff; }
+  .meta { padding:22px 22px 26px; }
+  .meta .no { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); }
+  .meta h2 { font-size:24px; font-weight:700; letter-spacing:-.02em; margin:8px 0 8px; }
+  .meta p { margin:0; color:var(--muted); font-size:13.5px; line-height:1.6; }
+  .meta .go { margin-top:18px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); }
+  .meta .go::after { content:" →"; }
+  footer { text-align:center; padding-bottom:60px; color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:12.5px; }
+  @media (max-width:820px){ .grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="eyebrow">Saebaan · direction study</div>
+  <h1>Three takes on the <span class="g">homepage</span></h1>
+  <p>Same brand, content, and dark-first magenta palette — three different personalities drawn from the Aeye reference. Open each, toggle light/dark, and pick a direction. Then we move up the stack.</p>
+</header>
+<div class="wrap">
+  <div class="lead">
+    <a class="card" href="demo-4-studio.html">
+      <div class="thumb t4"><b>04 · Studio</b></div>
+      <div class="meta"><span class="rec">Refined — start here</span><div class="no">// corporate-grade · Stripe / Linear / Mercury</div><h2>STUDIO</h2><p>The de-slopped direction. Light-first (dark toggle), restrained Inter typography with a single serif italic accent, a crafted product-dashboard hero instead of gimmicks, elegant project cards, and the “Have something to build?” contact CTA you liked. No blinking cursors, no marquees, no fake terminals.</p><div class="go">Open demo</div></div>
+    </a>
+  </div>
+  <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:20px 0 4px">Earlier explorations</p>
+  <div class="grid">
+    <a class="card" href="demo-1-grid.html">
+      <div class="thumb t1"><b>01 · Grid</b></div>
+      <div class="meta"><div class="no">// brutalist tech-grid</div><h2>GRID</h2><p>Closest to the reference — black canvas, pixel-mosaic hero, bold grotesk, monospace markers, boxed hairline grids, blinking cursor, sharp corners.</p><div class="go">Open demo</div></div>
+    </a>
+    <a class="card" href="demo-2-signal.html">
+      <div class="thumb t2"><b>02 · Signal</b></div>
+      <div class="meta"><div class="no">// refined dark editorial</div><h2>SIGNAL</h2><p>Magenta gradient forward with mdm's softer components — rounded cards, gradient pill buttons, ambient glow, alternating feature rows. Premium studio feel.</p><div class="go">Open demo</div></div>
+    </a>
+    <a class="card" href="demo-3-terminal.html">
+      <div class="thumb t3"><b>03 · Terminal</b></div>
+      <div class="meta"><div class="no">// developer studio</div><h2>TERMINAL</h2><p>The boldest risk — the site as a command line. Mono-forward, config-file hero, commit-log work list, file-tree service cards. Playful and technical.</p><div class="go">Open demo</div></div>
+    </a>
+  </div>
+</div>
+<footer>pick one · or mix elements across the three · then multi-page + working form</footer>
+</body>
+</html>
