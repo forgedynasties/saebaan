@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact &mdash; Saebaan</title>
+<title>Contact - Saebaan</title>
 <meta name="description" content="Start a project with Saebaan. Tell us what you are building and we will reply within a couple of days.">
 <link rel="canonical" href="https://saebaan.co.uk/contact.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Saebaan">
-<meta property="og:title" content="Contact &mdash; Saebaan">
+<meta property="og:title" content="Contact - Saebaan">
 <meta property="og:description" content="Start a project with Saebaan. Tell us what you are building and we will reply within a couple of days.">
 <meta property="og:url" content="https://saebaan.co.uk/contact.html">
 <meta property="og:image" content="https://saebaan.co.uk/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Contact &mdash; Saebaan">
+<meta name="twitter:title" content="Contact - Saebaan">
 <meta name="twitter:description" content="Start a project with Saebaan. Tell us what you are building and we will reply within a couple of days.">
 <meta name="twitter:image" content="https://saebaan.co.uk/assets/og-image.png">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -61,7 +61,7 @@
       <div class="page-head reveal">
         <span class="label">Contact</span>
         <h1>Have something to build?</h1>
-        <p>Tell us what you're making. We reply to every serious brief within a couple of days &mdash; no forms into the void.</p>
+        <p>Tell us what you're making. We reply to every serious brief within a couple of days - no forms into the void.</p>
       </div>
     </div>
   </section>
@@ -72,7 +72,7 @@
         <div class="form-side">
           <span class="label">Prefer email?</span>
           <h2>Reach us directly.</h2>
-          <p>We're a small team, so you'll talk to the people who actually design and build your product &mdash; no account managers in the middle.</p>
+          <p>We're a small team, so you'll talk to the people who actually design and build your product - no account managers in the middle.</p>
           <div class="direct">
             <a href="mailto:hello@saebaan.co.uk"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg></span>hello@saebaan.co.uk</a>
             <a href="https://www.linkedin.com/in/saibaan-haider/" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>Connect on LinkedIn</a>
@@ -87,7 +87,7 @@
           <div class="field"><label for="company">Company</label><input id="company" name="company" type="text" autocomplete="organization"></div>
           <div class="field-row">
             <div class="field"><label for="type">What do you need?</label><select id="type" name="project_type"><option>Web application</option><option>Brand &amp; identity</option><option>App development</option><option>AI automation / DevOps</option><option>Something else</option></select></div>
-            <div class="field"><label for="budget">Budget</label><select id="budget" name="budget"><option>Not sure yet</option><option>Under &pound;10k</option><option>&pound;10k&ndash;&pound;25k</option><option>&pound;25k&ndash;&pound;50k</option><option>&pound;50k+</option></select></div>
+            <div class="field"><label for="budget">Budget</label><select id="budget" name="budget"><option>Not sure yet</option><option>Under &pound;10k</option><option>&pound;10k to &pound;25k</option><option>&pound;25k to &pound;50k</option><option>&pound;50k+</option></select></div>
           </div>
           <div class="field"><label for="message">Project details <span class="req">*</span></label><textarea id="message" name="message" required placeholder="What are you building, and what does success look like?"></textarea></div>
           <button type="submit" class="btn btn-primary form-submit">Send brief <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -106,7 +106,7 @@
       <div><h6>Work</h6><a href="work-aio-mdm.html">AIO MDM</a><a href="work-prescribeandco.html">Prescribe&amp;Co</a></div>
       <div><h6>Contact</h6><a href="contact.html">Start a project</a><a href="mailto:hello@saebaan.co.uk">hello@saebaan.co.uk</a><a href="privacy.html">Privacy</a></div>
     </div>
-    <div class="foot-bottom"><span>&copy; 2026 Saebaan &mdash; all rights reserved</span><span>Designed &amp; built in-house</span></div>
+    <div class="foot-bottom"><span>&copy; 2026 Saebaan - all rights reserved</span><span>Designed &amp; built in-house</span></div>
   </div>
 </footer>
 
@@ -136,7 +136,7 @@
     var btn = form.querySelector('button[type=submit]'); btn.disabled = true; btn.style.opacity = .7;
     fetch(ENDPOINT, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } })
       .then(function(r){
-        if (r.ok) { form.reset(); status.textContent = "Thanks \u2014 your brief is in. We\u2019ll reply within a couple of days."; status.className = 'form-status ok show'; }
+        if (r.ok) { form.reset(); status.textContent = "Thanks - your brief is in. We\u2019ll reply within a couple of days."; status.className = 'form-status ok show'; }
         else { throw new Error('bad'); }
       })
       .catch(function(){ status.innerHTML = 'Something went wrong. Email us directly at <a href="mailto:hello@saebaan.co.uk" style="color:inherit;text-decoration:underline">hello@saebaan.co.uk</a>.'; status.className = 'form-status err show'; })
