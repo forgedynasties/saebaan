@@ -139,8 +139,8 @@
   .aiomdm .b-aio { font-weight: 700; background: linear-gradient(90deg, #7a80f6 0%, #f9674e 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
   .aiomdm .b-mdm { font-weight: 600; color: #3f3f46; }
   html[data-theme="dark"] .aiomdm .b-mdm { color: #fff; }
-  .paco-logo { display: block; height: 44px; width: 88px; background: #9766C1; -webkit-mask: url(assets/paco-logo.png) left center / contain no-repeat; mask: url(assets/paco-logo.png) left center / contain no-repeat; }
-  html[data-theme="dark"] .paco-logo { background: #b794d4; }
+  .paco-logo { display: block; height: 44px; width: auto; }
+  html[data-theme="dark"] .paco-logo { filter: brightness(1.18); }
   .clogo-link .ext { width: 13px; height: 13px; margin-top: 1px; flex: none; fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .7; transition: stroke .2s, opacity .2s, transform .18s; }
   .clogo-link:hover .ext { stroke: var(--accent); opacity: 1; transform: translate(1px,-1px); }
 
