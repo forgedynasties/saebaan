@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saebaan.co.uk/sitemap.xml
