@@ -184,9 +184,13 @@
   .proj-body p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.62; }
   .proj-tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 26px; }
   .proj-tags span { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 20px; padding: 4px 12px; }
-  .proj-link { margin-top: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 500; color: var(--accent); }
+  .proj-actions { margin-top: auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 4px; }
+  .proj-link { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 500; color: var(--accent); }
   .proj-link svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .16s; }
   .proj:hover .proj-link svg { transform: translate(2px,-2px); }
+  .proj-open { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 500; color: var(--muted); border: 1px solid var(--line); border-radius: 30px; padding: 7px 15px; transition: border-color .15s, color .15s; }
+  .proj-open:hover { border-color: var(--accent); color: var(--accent); }
+  .proj-open svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .proj-media { position: relative; background: linear-gradient(155deg, var(--bg-soft), var(--card)); padding: 40px 40px 0; display: flex; align-items: flex-end; overflow: hidden; min-height: 340px; }
   .proj-media::before { content: ""; position: absolute; top: -30%; right: -20%; width: 60%; height: 90%; background: radial-gradient(circle, var(--glow), transparent 70%); filter: blur(40px); }
   .mini { position: relative; width: 100%; border: 1px solid var(--line); border-top-left-radius: 12px; border-top-right-radius: 12px; background: var(--card); box-shadow: var(--shadow); overflow: hidden; }
