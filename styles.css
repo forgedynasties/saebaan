@@ -141,7 +141,7 @@
   html[data-theme="dark"] .aiomdm .b-mdm { color: #fff; }
   .paco-logo { display: block; height: 44px; width: auto; }
   html[data-theme="dark"] .paco-logo { filter: brightness(1.18); }
-  .windsor-logo { display: block; height: 54px; width: auto; }
+  .windsor-logo { display: block; height: 54px; width: 120px; flex: none; }
   html[data-theme="dark"] .windsor-logo { filter: brightness(0) invert(1); opacity: .92; }
   .clogo-link .ext { width: 13px; height: 13px; margin-top: 1px; flex: none; fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .7; transition: stroke .2s, opacity .2s, transform .18s; }
   .clogo-link:hover .ext { stroke: var(--accent); opacity: 1; transform: translate(1px,-1px); }
